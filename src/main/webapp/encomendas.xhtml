@@ -1,0 +1,430 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<!DOCTYPE HTML>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui">
+    
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"/>	
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>	
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>		
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    
+    <h:head>
+    	<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+        <title>Encomendas</title>
+        <style>
+		    .form-control{
+			  margin-bottom: 5px;
+			  margin-right: 5px;
+			}
+		
+			#encomendasTable{
+			  margin-top: 10px;
+			}
+			
+			#addBtnn{
+			  margin-bottom: 50px;
+			}
+			
+		    .form-control{
+				margin-bottom: 5px;
+				margin-right: 5px;
+			}
+			
+			.table, th, td{
+				text-align: center;
+				border: 1px solid black
+			}
+	
+	    </style>
+	    <!--Navbar-->
+	    <div id="nav-placeholder"></div>
+	
+	    <script>
+		    $(function(){
+		      $("#nav-placeholder").load("nav.xhtml");
+		    });
+	    </script>
+	    <!--Navbar-->
+    </h:head>    
+		
+		<h:body bgcolor="white">   	
+    	<h:form id="pesquisaForm">
+    	<div class="form-inline">
+    	    <h:inputText class="form-control col-xs-2" value = "#{nomePesquisa}" a:placeholder = "Nome"/>
+	    	<h:inputText class="form-control" value = "#{telefonePesquisa}" a:placeholder = "Telefone"/>
+	    	<h:inputText class="form-control" value = "#{cpf}" a:placeholder = "CPF"/>
+	    	<h:commandButton class="btn btn-primary" action="#{clienteBean.filtrarClientes(nomePesquisa, telefonePesquisa, cpf)}" update="clientesTable" value="Pesquisar"/>
+			<button id="cadastroBtn" type="button" onclick="limparCampos()" class="btn btn-success" data-toggle="modal" data-target="#dadosEncomendaModal">Cadastrar</button>
+			</div>
+		</h:form>		
+		
+		<table id="encomendasTable" class="table table-striped">
+    		<thead style = "text-align: center ">
+			    <tr>
+			        <th scope="col">Cliente</th>
+			        <th scope="col">Insumo</th>
+					<th scope="col">Telefone</th>
+					<th scope="col">Endereço</th>
+					<th scope="col">Data</th>
+					<th scope="col">Hora</th>
+					<th scope="col">Pagamento</th>
+					<th scope="col">Status</th>
+					<th scope="col">Entrega</th>
+					<th scope="col">Observação</th>
+					<th scope="col">Total</th>
+					<th scope="col"> </th>
+				</tr>
+			</thead>
+			<tbody style="vertical-align: middle;">
+				<ui:repeat value = "#{encomendaBean.encomendas}" var = "encomenda">
+					<tr>
+						<td style="vertical-align: middle;"><h:outputText name="clienteOt" value = "#{encomenda.getCliente().getNome()}"/></td>
+						<td style="vertical-align: middle;">						
+							<table id="encomendasTable" class="table table-striped">
+								<tbody style="vertical-align: middle;">
+									<ui:repeat value = "#{encomendaBean.getEncomendaInsumos(encomenda.getId())}" var = "encomendaInsumo">
+										<tr>
+											<td><h:outputText value = "#{encomendaInsumo.getQtd()}" /></td>
+											<td><h:outputText value = "#{encomendaInsumo.getInsumo().getNome()}"/></td>
+											<td>
+												<h:form>	            							
+													<button type="button" onclick="excluirInsumo(#{encomendaInsumo.getId()})"
+															class="btn btn-danger btn-primary" data-toggle="modal" data-target="#confirmarExlusaoModal"><span class='glyphicon glyphicon-remove'/></button>
+												</h:form>
+											</td>											
+										</tr>
+									</ui:repeat>									
+								</tbody>	
+							</table>						
+							<button type="button" onclick="addInsumo(#{encomenda.getId()})" class="btn btn-success" 
+        										data-toggle="modal" data-target="#addInsumosModal">+</button>
+						</td>						
+						<td style="vertical-align: middle;"><h:outputText name="telefone" value = "#{encomenda.getCliente().getTelefone()}"/></td>
+						<td style="vertical-align: middle;">
+							<h:outputText id="cidadeOt" value = "#{encomenda.getCliente().getEndereco().getLogradouro().getBairro().getCidade().getNome()}"/>,
+						    <h:outputText id="cepOt" value = "#{encomenda.getCliente().getEndereco().getCep()}"/><br/>
+						    <h:outputText id="bairroOt" value = "#{encomenda.getCliente().getEndereco().getLogradouro().getBairro().getNome()}"/><br/>
+						    <h:outputText id="logradouroOt" value = "#{encomenda.getCliente().getEndereco().getLogradouro().getNome()}"/>,
+						    <h:outputText id="numeroOt" value = "#{encomenda.getCliente().getEndereco().getNumero()}"/><br/> 
+						    <h:outputText id="complementoOt" value = "#{encomenda.getCliente().getEndereco().getComplemento()}"/>
+						</td>
+						<td style="vertical-align: middle;"><h:outputText id="dataOt" value = "#{encomenda.getData()}"/></td>
+						<td style="vertical-align: middle;"><h:outputText id="horaOt" value = "#{encomenda.getHora()}"/></td>
+						<td style="vertical-align: middle;"><h:outputText id="pagamentoOt" value = "#{encomenda.getPagamento().getNome()}"/></td>
+						<td style="vertical-align: middle;"><h:outputText id="statusOt" value = "#{encomenda.getStatus_pgto()}"/></td>
+						<td style="vertical-align: middle;"><h:outputText id="entregaOt" value = "#{encomenda.getEntrega()}"/></td>
+						<td style="vertical-align: middle;"><h:outputText id="obsOt" value = "#{encomenda.getObs()}"/></td>
+						<td style="vertical-align: middle;"><h:outputText id="totalOt" value = "R$ #{encomenda.getTotal()}"/></td>
+						<td style="vertical-align: middle;">
+							<button id="editarBtn" class="btn btn-primary" type="button" data-toggle="modal" data-target="#dadosEncomendaModal" 
+						   			onclick="preencherCampos('#{encomenda.getId()}',
+						   									 '#{encomenda.getCliente().getNome()}',
+						   									 '#{encomenda.getData()}',
+						   									 '#{encomenda.getHora()}',
+						   									 '1',
+						   									 '#{encomenda.getPagamento().getNome()}',
+						   									 '#{encomenda.getStatus_pgto()}',
+						   									 '#{encomenda.getEntrega()}',
+						   									 '#{encomenda.getObs()}')"><span class='glyphicon glyphicon-edit'/></button>
+						   <button type="button" class="btn btn-danger"  onclick="excluir(#{encomenda.getId()})" data-toggle="modal" data-target="#confirmarExlusaoModal">Cancelar</button>
+						</td>
+					</tr>
+				</ui:repeat>
+			</tbody>
+		</table>
+		
+		<!-- Janela de cadastro/edição -->		
+		<div id="dadosEncomendaModal" class="modal fade" role="dialog">
+		  <div class="modal-dialog modal-dialog-centered">		
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <button type="button" class="close btn-default" data-dismiss="modal"><span class='glyphicon glyphicon-remove'/></button>
+		        <h4 class="modal-title" align="center">Dados da encomenda</h4>
+		      </div>
+		      <div class="modal-body" style="text-align: center">
+		        <h:form id="dadosEncomendaForm">
+		        	<h:inputHidden id="id" value="#{id}"/>
+		    	    <h:inputText class="form-control form-control-sm" id="cliente" value = "#{cliente}" a:placeholder = "Cliente"/> <br/>
+		    	    <h:inputText class="form-control form-control-sm" id="data" value = "#{data}" a:placeholder = "Data"/> <br/>
+			    	<h:inputText class="form-control form-control-sm" id="hora" value = "#{hora}" a:placeholder = "Hora"/> <br/>			    			
+			    	
+				    	<h:outputLabel value = "Insumos" for="insumosTableCadastro"/> <br/>
+				    	
+				    	<table id="insumosCadastroTable" value="#{encomendaBean.tabela}" class="table" style="justify-content: center; ">
+			    		<thead>
+						    <tr>
+						        <th scope="col">ID</th>
+						        <th scope="col">Qtd</th>
+								<th scope="col">Insumo</th>
+								<th scope="col"></th>
+							</tr>
+						</thead>
+						<tbody>
+						</tbody>
+				    	</table>
+				    	<button id="addBtnn" type="button" class="btn btn-success" data-toggle="modal" data-target="#addInsumosCadastroModal">+</button>
+					   
+			    	<h:inputText class="form-control form-control-sm" id="pagamento" value = "#{pagamento}" a:placeholder = "Forma de pagamento"></h:inputText> <br/>			    	
+			    	<h:inputText class="form-control form-control-sm" id="status" value = "#{status}" a:placeholder = "Status"></h:inputText> <br/>			    	
+			    	<h:inputText class="form-control form-control-sm" id="entrega" value = "#{entrega}" a:placeholder = "Forma de entrega"></h:inputText> <br/>			    	
+			    	<h:inputText class="form-control form-control-sm" id="obs" value = "#{obs}" a:placeholder = "Observação"></h:inputText> <br/>			    	
+			    	
+			    	<h:commandButton class="btn btn-success" update="encomendasTable" value="Salvar"/>	
+		        	<button type="button" onclick="limparCampos()" class="btn btn-default">Limpar</button>
+		        </h:form>
+		      </div>
+		    </div>
+		  </div>
+		</div>
+			
+		<!-- Confirmar cancelamento da encomenda -->
+		<div id="confirmarCancelamentoModal" class="modal fade" role="dialog">
+		    <div class="modal-dialog modal-dialog-centered">
+		        <div class="modal-content">
+		            <div class="modal-body" style="text-align: center">
+		                <h4 style="text-align: center">Deseja cancelar esta encomenda?</h4>
+		            </div>
+		            <div class="modal-footer" style="text-align: center">
+		            	<h:form id="cancelamentoForm">		        
+		            		<h:inputHidden value="#{encomendaId}" id="encomendaId"/>    	
+			                <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+			                <h:commandButton class="btn btn-danger btn-ok" action = "#{encomendaBean.deletar(encomendaId)}" update="encomendasTable" value="Excluir"/>
+		                </h:form>
+		            </div>
+		        </div>
+		    </div>
+		</div>	
+		
+		<!-- Confirmar exclusão do insumo -->
+		<div id="confirmarExlusaoModal" class="modal fade" role="dialog">
+		    <div class="modal-dialog modal-dialog-centered">
+		        <div class="modal-content">
+		            <div class="modal-body" style="text-align: center">
+		                <h4 style="text-align: center">Deseja remover este insumo da encomenda?</h4>
+		            </div>
+		            <div class="modal-footer" style="text-align: center">
+		            	<h:form id="exclusaoForm">		        
+		            		<h:inputHidden value="#{insumoId}" id="insumoId"/>
+			                <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+			                <h:commandButton class="btn btn-danger btn-ok" action = "#{encomendaBean.removerEncomendaInsumo(insumoId)}" update="encomendasTable" value="Excluir"/>
+		                </h:form>
+		            </div>
+		        </div>
+		    </div>
+		</div>
+					
+		<!-- Adicionar novo insumo à encomenda-->
+		<div id="addInsumosModal" class="modal fade" role="dialog">
+		  <div class="modal-dialog modal-dialog-centered">		
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <button type="button" class="close" data-dismiss="modal"><span class='glyphicon glyphicon-remove'/></button>
+		        <h4 class="modal-title" align="center">Insumos</h4>
+		      </div>
+		      <div class="modal-body" style="text-align: center">
+		        <h:form id="insumosForm">
+		        	<h:inputHidden id="encomendaIdAdd" name="encomendaIdAdd" value="#{encomendaIdAdd}"/>
+			    	
+			    	<table class="table">
+					  <thead>
+					    <tr>
+					      <th scope="col">Insumo</th>
+					      <th scope="col">Quantidade disponível</th>
+					      <th scope="col"></th>
+					    </tr>
+					  </thead>
+					  <tbody>
+					    <ui:repeat id="insumosAddEncomenda" var="insumo" value="#{encomendaBean.insumos}">
+					    	<tr>
+						      <td>#{insumo.getNome()}</td>
+						      <td>#{insumo.getQtdestoque()}</td>
+						      
+							  <td>
+							  	<button type="button" onclick="qtdInsData(#{insumo.getId()}, #{insumo.getQtdestoque()})" data-toggle="modal" data-target="#quantidadeInsumoModal">Adicionar</button>			  														  	
+							  </td>
+						    </tr>
+        				</ui:repeat>
+					    <h:message for="adicionarBtn" />
+					  </tbody>
+					</table>
+		        </h:form>
+		      </div>
+		    </div>
+		  </div>
+		</div>
+		        
+		<!-- Adicionar novo insumo na encomenda em cadastro -->
+		<div id="addInsumosCadastroModal" class="modal fade" role="dialog">
+		  <div class="modal-dialog modal-dialog-centered">		
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <button type="button" class="close" data-dismiss="modal"><span class='glyphicon glyphicon-remove'/></button>
+		        <h4 class="modal-title" align="center">Insumos</h4>
+		      </div>
+		      <div class="modal-body" style="text-align: center">
+		        <h:form id="insumosFormCadastro">
+		        	<h:inputHidden id="encomendaIdAdd" name="encomendaIdAdd" value="#{encomendaIdAdd}"/>
+			    	
+			    	<table class="table">
+					  <thead>
+					    <tr>
+					      <th scope="col">Insumo</th>
+					      <th scope="col">Quantidade disponível</th>
+					      <th scope="col"></th>
+					    </tr>
+					  </thead>
+					  <tbody>
+					    <ui:repeat id="insumosAddCadastro" var="insumo" value="#{encomendaBean.insumos}">
+					    	<tr>
+						      <td>#{insumo.getNome()}</td>
+						      <td>#{insumo.getQtdestoque()}</td>
+						      
+							  <td>
+							  	<button type="button" onclick="qtdInsumoCadastro(#{insumo.getId()}, '#{insumo.getNome()}', #{insumo.getQtdestoque()})" data-toggle="modal" data-target="#quantidadeInsumoCadastroModal">Adicionar</button>			  														  	
+							  </td>
+						    </tr>
+        				</ui:repeat>
+					    <h:message for="adicionarBtn" />
+					  </tbody>
+					</table>
+		        </h:form>
+		      </div>
+		    </div>
+		  </div>
+		</div>
+		        
+		<!-- Quantidade do insumo a ser adicionado à encomenda -->
+		<div id="quantidadeInsumoModal" class="modal fade" role="dialog">
+		  <div class="modal-dialog modal-dialog-centered">		
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <h4 class="modal-title" align="center">Informe a quantidade desejada</h4>
+		      </div>
+		      <div class="modal-body" style="text-align: center">
+		        <h:form id="qtdInsumoForm" >
+		        	<h:inputHidden id="encomendaIdAddd" value="#{encomendaIdAddd}"/>
+		        	<h:inputHidden id="insumoQ" value="#{insumoQ}"/>
+		        	<h:inputHidden id="qtdEstoque" value="#{qtdEstoque}"/>
+		        	
+			      	<h:inputText class="form-control form-control-sm"  id="qtdInsumo" type="number" maxlength="3" required="true" value="#{qtdInsumo}" a:placeholder="Quantidade"/>
+				  	<h:commandButton id="adicionarBtn" action="#{encomendaBean.adicionarEncomendaInsumo(encomendaIdAddd, insumoQ, qtdInsumo, qtdEstoque)}" value="Adicionar" update="encomendasTable"/>
+		        </h:form>
+		      </div>
+		      <div class="modal-footer">
+		        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+		      </div>
+		    </div>
+		  </div>
+		</div>        
+		        
+		<!-- Quantidade do insumo a ser adicionado à encomenda em cadastro -->
+		<div id="quantidadeInsumoCadastroModal" class="modal fade" role="dialog">
+		  <div class="modal-dialog modal-dialog-centered">		
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <h4 class="modal-title" align="center">Informe a quantidade desejada</h4>
+		      </div>
+		      <div class="modal-body" style="text-align: center">
+		        <h:form id="qtdInsumoCadastroForm">
+		        	<h:inputHidden class="form-control form-control-sm" id="idInsumoCadastro" value="#{idInsumoCadastro}"/>
+		        	<h:inputHidden class="form-control form-control-sm" id="nomeInsumoCadastro" value="#{nomeInsumoCadastro}"/>
+		        	<h:inputHidden class="form-control form-control-sm" id="qtdEstoqueCadastro" value="#{qtdEstoqueCadastro}"/>
+		        	
+			      	<h:inputText class="form-control form-control-sm" id="qtdInsumoCadastro" type="number" maxlength="3" required="true" value="#{qtdInsumoCadastro}" a:placeholder="Quantidade"/>
+				  	<button class="btn btn-success" onclick="addInsumoCadastro()" data-dismiss="modal">Ok</button>
+		        </h:form>
+		      </div>
+		      <div class="modal-footer">
+		        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+		      </div>
+		    </div>
+		  </div>
+		</div>        
+		        
+		<script>
+			function limparCampos(){
+				$('#dadosEncomendaForm\\:id').val("")
+				$('#dadosEncomendaForm\\:cliente').val("")
+				$('#dadosEncomendaForm\\:data').val("")
+				$('#dadosEncomendaForm\\:hora').val("")
+				$('#dadosEncomendaForm\\:insumos').val(null)
+				$('#dadosEncomendaForm\\:pagamento').val("")
+				$('#dadosEncomendaForm\\:status').val("")
+				$('#dadosEncomendaForm\\:entrega').val("")
+				$('#dadosEncomendaForm\\:obs').val("")
+				
+			}	
+			
+			function preencherCampos(id, cliente, data, hora, insumos, pagamento, status, entrega, obs){
+				$('#dadosEncomendaForm\\:id').val(id)
+				$('#dadosEncomendaForm\\:cliente').val(cliente)
+				$('#dadosEncomendaForm\\:data').val(data)
+				$('#dadosEncomendaForm\\:hora').val(hora)
+				$('#dadosEncomendaForm\\:insumosTableCadastro').val(insumos)
+				$('#dadosEncomendaForm\\:pagamento').val(pagamento)
+				$('#dadosEncomendaForm\\:status').val(status)
+				$('#dadosEncomendaForm\\:entrega').val(entrega)
+				$('#dadosEncomendaForm\\:obs').val(obs)
+			}
+			
+			function qtdInsData(insumoId, qtdEstoque){			
+				$('#qtdInsumoForm\\:insumoQ').val(insumoId)
+				$('#qtdInsumoForm\\:encomendaIdAddd').val($('#insumosForm\\:encomendaIdAdd').val())
+				$('#qtdInsumoForm\\:qtdEstoque').val(qtdEstoque)
+			}
+			
+			function excluirInsumo(id){
+				$('#exclusaoForm\\:insumoId').val(id)
+			}
+			
+			function qtdInsumo(id){
+				$('#exclusaoForm\\:insumoId').val(id)
+			}
+			
+			function addInsumo(id){
+				$('#insumosForm\\:encomendaIdAdd').val(id)
+			}
+			
+			function cancelar(id){
+				$('#exclusaoForm\\:encomendaId').val(id)				
+			}
+			
+			function qtdInsumoCadastro(qtdInsumoCadastro, nomeInsumoCadastro, qtdEstoqueCadastro){
+				$('#qtdInsumoCadastroForm\\:idInsumoCadastro').val(qtdInsumoCadastro)
+				$('#qtdInsumoCadastroForm\\:nomeInsumoCadastro').val(nomeInsumoCadastro)
+				$('#qtdInsumoCadastroForm\\:qtdEstoqueCadastro').val(qtdEstoqueCadastro)
+			}
+			
+			function deleteInsumo(row){		        
+				$(row).parents("tr").remove();
+
+		        $('#qtdInsumoCadastroForm\\:qtdInsumoCadastro').val($('#qtdInsumoCadastroForm\\:qtdInsumoCadastro').val()+$('#qtdInsumoCadastroForm\\:qtdInsumoCadastro').val())
+		    }
+		    
+		    function addInsumoCadastro() { 
+		    	var id = $('#qtdInsumoCadastroForm\\:idInsumoCadastro').val() 
+		    	var nome = $('#qtdInsumoCadastroForm\\:nomeInsumoCadastro').val() 
+		    	var qtd = $('#qtdInsumoCadastroForm\\:qtdInsumoCadastro').val()
+		    	var qtdEstoque = $('#qtdInsumoCadastroForm\\:qtdEstoqueCadastro').val()
+		    	
+		        $("#insumosCadastroTable tbody").append('<tr>' +
+		                '<td>' + id + '</td>' +
+		                '<td>' + nome + '</td>' +
+		                '<td>' + qtd + '</td>' +
+		                '<td>'+
+		                	'<button type="button" onclick="deleteInsumo(this)" class="btn btn-danger">' +
+		                		'<span class="glyphicon glyphicon-remove"/>' +
+		                	'</button>'+
+		                '</td>' +
+	                '</tr>');
+		        	
+		        $('#qtdInsumoCadastroForm\\:qtdInsumoCadastro').val(qtdEstoque - qtd)
+		    }
+		</script>
+    </h:body>
+</html>

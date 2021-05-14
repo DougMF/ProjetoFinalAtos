@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<!DOCTYPE HTML>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:a="http://xmlns.jcp.org/jsf/passthrough">
+    
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"/>	
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>	
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>	
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    
+    <h:head>
+    	<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+    	<style>
+		    .form-control{
+			  margin-bottom: 5px;
+			  margin-right: 5px;
+			}
+		
+			#insumosTable{
+			  margin-top: 10px;
+			}
+		</style>
+    
+        <title>Insumos</title>
+        <!--Navbar-->
+	    <div id="nav-placeholder"></div>
+	
+	    <script>
+		    $(function(){
+		      $("#nav-placeholder").load("nav.xhtml");
+		    });
+	    </script>
+	    <!--Navbar-->
+    </h:head>
+    
+    <h:body bgcolor="white">
+    	<h:form id="pesquisaForm">
+	    	<div class="form-inline">
+	    	    <h:inputText class="form-control form-control-sm" value = "#{insumoPesquisa}" a:placeholder = "Insumo"/>
+		    	<h:commandButton class="btn btn-primary" action="#{insumoBean.getInsumo(insumoPesquisa)}" update="insumosTable" value="Pesquisar"/>		    	
+				<button id="cadastroBtn" type="button" onclick="limparCampos()" class="btn btn-success" data-toggle="modal" data-target="#dadosModal">Cadastrar</button>
+			</div>
+		</h:form>
+		
+		
+        <h:dataTable id="insumosTable" class="table table-striped" value = "#{insumoBean.insumos}" var = "insumo"
+         				border = "1" cellpadding = "10" cellspacing = "1" style = "text-align: center ">
+         		
+  		   <h:column>
+			   <f:facet name = "header">Nome</f:facet>		   
+			   <h:outputText name="nomeOt" value = "#{insumo.getNome()}"/>
+  		   </h:column>
+  		   
+  		   <h:column>
+			   <f:facet name = "header">Valor</f:facet>		   
+			   <h:outputText id="valorOt" value = "R$ #{insumo.getValor()}"/>
+  		   </h:column>
+  		   
+  		   <h:column>
+			   <f:facet name = "header">Quantidade em estoque</f:facet>		   
+			   <h:outputText id="qtdEstoqueOt" value = "#{insumo.getQtdestoque()}"/>
+  		   </h:column>
+  		   
+  		    <h:column>  
+			   <button id="editarBtn" class="btn btn-primary" type="button" data-toggle="modal" data-target="#dadosModal" 
+			   			onclick="preencherCampos('#{insumo.getId()}',
+			   									 '#{insumo.getNome()}',
+			   									 '#{insumo.getValor()}',
+			   									 '#{insumo.getQtdestoque()}')"><span class='glyphicon glyphicon-edit'/></button>
+			   <button type="button" class="btn btn-danger"  onclick="excluir(#{insumo.getId()})" data-toggle="modal" data-target="#confirmar-exclusao"><span class='glyphicon glyphicon-remove'/></button>  
+  		   </h:column>    		     		   
+		</h:dataTable>
+		
+		<!-- Janela de cadastro/edição -->		
+		<div id="dadosModal" class="modal fade" role="dialog">
+		  <div class="modal-dialog modal-dialog-centered">		
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <button type="button" class="close" data-dismiss="modal"><span class='glyphicon glyphicon-remove'/></button>
+		        <h4 class="modal-title" align="center">Dados do insumo</h4>
+		      </div>
+		      <div class="modal-body"  style="text-align: center">
+		        <h:form id="dadosForm" >
+		        	<h:inputHidden id="id" value="#{id}"/>
+		    	    <h:inputText class="form-control form-control-sm" id="nome" value = "#{nome}" a:placeholder = "Nome"></h:inputText> <br/>
+		    	    <h:inputText class="form-control form-control-sm" id="valor" value = "#{valor}" a:placeholder = "Valor"></h:inputText> <br/>
+			    	<h:inputText class="form-control form-control-sm" id="qtdEstoque" value = "#{qtdEstoque}" a:placeholder = "Quantidade em estoque"></h:inputText> <br/>			    	
+			    	
+			    	<h:commandButton class="btn btn-success" action="#{insumoBean.cadastrar(id, nome, valor, qtdEstoque)}" update="insumosTable" value="Salvar"/>	
+		        	<button type="button" class="btn btn-default" onclick="limparCampos()">Limpar</button>
+		        </h:form>
+		      </div>
+		    </div>
+		  </div>
+		</div>
+			
+		<!-- Confirmar exclusão -->
+		<div id="confirmar-exclusao" class="modal fade" role="dialog">
+		    <div class="modal-dialog modal-dialog-centered">
+		        <div class="modal-content">
+		            <div class="modal-body" style="text-align: center">
+		                <h4 style="text-align: center">Deseja excluir este insumo?</h4>
+		            </div>
+		            <div class="modal-footer" style="text-align: center">
+		            	<h:form id="exclusaoForm" >		        
+		            		<h:inputHidden value="#{insumoId}" id="insumoId"/>    	
+			                <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
+			                <h:commandButton class="btn btn-danger btn-danger" action = "#{insumoBean.deletar(insumoId)}" update="insumosTable" value="Excluir"/>
+		                </h:form>
+		            </div>
+		        </div>
+		    </div>
+		</div>			
+		        
+		<script>
+			function limparCampos(){
+				$('#dadosForm\\:id').val("")
+				$('#dadosForm\\:nome').val("")
+				$('#dadosForm\\:valor').val("")
+				$('#dadosForm\\:qtdEstoque').val("")
+			}	
+			
+			function preencherCampos(id, nome, valor, qtdEstoque){
+				$('#dadosForm\\:id').val(id)
+				$('#dadosForm\\:nome').val(nome)
+				$('#dadosForm\\:valor').val(valor)
+				$('#dadosForm\\:qtdEstoque').val(qtdEstoque)
+			}
+			
+			function excluir(id){
+				$('#exclusaoForm\\:insumoId').val(id)
+			}
+		</script>
+    </h:body>
+</html>

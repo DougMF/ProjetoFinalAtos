@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<!DOCTYPE HTML>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>jQuery UI Dialog - Default functionality</title>
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"/>
+  <link rel="stylesheet" href="/resources/demos/style.css"/>
+  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"/>
+<!-- Optional Bootstrap theme -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous"/>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+  
+  <script>
+  $( function() {
+    $( "#dialog" ).dialog();
+  } );
+  
+  $(document).ready(function() {
+	  $("form").submit(function() {
+	    Fname = $("input[name='fname']").val();
+	    Lname = $("input[name='lname']").val();
+	    Address = $("input[name='address']").val();
+
+	    console.log("First Name " + Fname);
+	    console.log("Last Name " + Lname);
+	    console.log("Address " + Address);
+
+	    return false;
+	  })
+	});
+  </script>
+</head>
+<body>
+
+
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#shipping">
+  Launch demo modal
+</button>
+
+<div class="modal fade" id="shipping" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">kkk</button>
+        <h1 id="modalHeader" class="modal-title"></h1>
+      </div>
+      <div align="center" id="imageinfo" class="modal-body">
+        <div>
+          <h3 id="modalHeader"><strong>Shipping Information</strong></h3>
+          <br />
+
+          <form action="cadastro.html" method="post">
+            <label><b>First Name</b></label>
+            <br />
+            <input type="text" placeholder="Enter First Name" name="fname" required="true"/>
+            <br /><br />
+            <label><b>Last Name</b></label>
+            <br />
+            <input type="text" placeholder="Enter Last Name" name="lname" required="true"/>
+            <br /><br />
+            <label><b>Address</b></label>
+            <input type="address" placeholder="Enter Address" name="address" required="true"/>
+            <br />
+            <div class="modal-footer">
+              <input type="submit" class="btn btn-default" value="Confirm Address" data-dismiss="static"/>
+              <button class="btn btn-default invoice">Final Invoice</button>
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
